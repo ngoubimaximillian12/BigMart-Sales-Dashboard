@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>fsdf.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #7a7e85;}
+.s1 { color: #bcbec4;}
+.s2 { color: #cf8e6d;}
+.s3 { color: #bcbec4;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+fsdf.py</font>
+</center></td></tr></table>
+<pre><span class="s0"># ✅ Import Required Libraries</span>
+<span class="s2">import </span><span class="s1">os</span>
+<span class="s2">import </span><span class="s1">numpy </span><span class="s2">as </span><span class="s1">np</span>
+<span class="s2">import </span><span class="s1">pandas </span><span class="s2">as </span><span class="s1">pd</span>
+<span class="s2">import </span><span class="s1">matplotlib</span><span class="s3">.</span><span class="s1">pyplot </span><span class="s2">as </span><span class="s1">plt</span>
+<span class="s2">import </span><span class="s1">seaborn </span><span class="s2">as </span><span class="s1">sns</span>
+
+<span class="s0"># Machine Learning Libraries</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">model_selection </span><span class="s2">import </span><span class="s1">train_test_split</span><span class="s3">, </span><span class="s1">GridSearchCV</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">preprocessing </span><span class="s2">import </span><span class="s1">LabelEncoder</span><span class="s3">, </span><span class="s1">StandardScaler</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">impute </span><span class="s2">import </span><span class="s1">SimpleImputer</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">linear_model </span><span class="s2">import </span><span class="s1">LinearRegression</span><span class="s3">, </span><span class="s1">Ridge</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">ensemble </span><span class="s2">import </span><span class="s1">RandomForestRegressor</span>
+<span class="s2">from </span><span class="s1">xgboost </span><span class="s2">import </span><span class="s1">XGBRegressor</span>
+<span class="s2">from </span><span class="s1">sklearn</span><span class="s3">.</span><span class="s1">metrics </span><span class="s2">import </span><span class="s1">mean_squared_error</span><span class="s3">, </span><span class="s1">r2_score</span>
+<span class="s2">import </span><span class="s1">joblib</span>
+
+<span class="s0"># ✅ Step 2: Hypothesis Generation</span>
+<span class="s1">hypotheses </span><span class="s3">= {</span>
+    <span class="s4">&quot;Higher MRP leads to higher sales&quot;</span><span class="s3">: </span><span class="s4">&quot;MRP vs Sales&quot;</span><span class="s3">,</span>
+    <span class="s4">&quot;Supermarkets have higher sales than Grocery Stores&quot;</span><span class="s3">: </span><span class="s4">&quot;Outlet Type vs Sales&quot;</span><span class="s3">,</span>
+    <span class="s4">&quot;Older outlets may have lower sales&quot;</span><span class="s3">: </span><span class="s4">&quot;Outlet Age vs Sales&quot;</span><span class="s3">,</span>
+    <span class="s4">&quot;Items with low visibility may have lower sales&quot;</span><span class="s3">: </span><span class="s4">&quot;Item Visibility vs Sales&quot;</span>
+<span class="s3">}</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Hypothesis Generation&quot;</span><span class="s3">)</span>
+<span class="s2">for </span><span class="s1">hypothesis</span><span class="s3">, </span><span class="s1">test </span><span class="s2">in </span><span class="s1">hypotheses</span><span class="s3">.</span><span class="s1">items</span><span class="s3">():</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;- </span><span class="s2">{</span><span class="s1">hypothesis</span><span class="s2">} </span><span class="s4">(</span><span class="s2">{</span><span class="s1">test</span><span class="s2">}</span><span class="s4">)&quot;</span><span class="s3">)</span>
+
+<span class="s0"># ✅ Step 3: Loading Data</span>
+<span class="s1">dataset_path </span><span class="s3">= </span><span class="s4">&quot;/Users/ngoubimaximilliandiamgha/.cache/kagglehub/datasets/shivan118/big-mart-sales-prediction-datasets/versions/1/train.csv&quot;</span>
+
+<span class="s2">if </span><span class="s1">os</span><span class="s3">.</span><span class="s1">path</span><span class="s3">.</span><span class="s1">exists</span><span class="s3">(</span><span class="s1">dataset_path</span><span class="s3">):</span>
+    <span class="s1">df </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">read_csv</span><span class="s3">(</span><span class="s1">dataset_path</span><span class="s3">)</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Dataset Loaded Successfully!&quot;</span><span class="s3">)</span>
+<span class="s2">else</span><span class="s3">:</span>
+    <span class="s2">raise </span><span class="s1">FileNotFoundError</span><span class="s3">(</span><span class="s4">f&quot;File not found: </span><span class="s2">{</span><span class="s1">dataset_path</span><span class="s2">}</span><span class="s4">. Check the path!&quot;</span><span class="s3">)</span>
+
+<span class="s0"># ✅ Step 4: Data Structure and Content</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Dataset Shape:&quot;</span><span class="s3">, </span><span class="s1">df</span><span class="s3">.</span><span class="s1">shape</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Dataset Info:&quot;</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s1">df</span><span class="s3">.</span><span class="s1">info</span><span class="s3">())</span>
+
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">First 5 Rows:&quot;</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s1">df</span><span class="s3">.</span><span class="s1">head</span><span class="s3">())</span>
+
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Missing Values:</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">, </span><span class="s1">df</span><span class="s3">.</span><span class="s1">isnull</span><span class="s3">().</span><span class="s1">sum</span><span class="s3">())</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Dataset Description:</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">, </span><span class="s1">df</span><span class="s3">.</span><span class="s1">describe</span><span class="s3">())</span>
+
+<span class="s0"># ✅ Step 6: Univariate Analysis</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">figure</span><span class="s3">(</span><span class="s1">figsize</span><span class="s3">=(</span><span class="s5">8</span><span class="s3">, </span><span class="s5">6</span><span class="s3">))</span>
+<span class="s1">sns</span><span class="s3">.</span><span class="s1">histplot</span><span class="s3">(</span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Outlet_Sales'</span><span class="s3">], </span><span class="s1">bins</span><span class="s3">=</span><span class="s5">50</span><span class="s3">, </span><span class="s1">kde</span><span class="s3">=</span><span class="s2">True</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">title</span><span class="s3">(</span><span class="s4">&quot;Sales Distribution&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">xlabel</span><span class="s3">(</span><span class="s4">&quot;Sales&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">ylabel</span><span class="s3">(</span><span class="s4">&quot;Frequency&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">show</span><span class="s3">()</span>
+
+<span class="s0"># ✅ Step 7: Bivariate Analysis</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">figure</span><span class="s3">(</span><span class="s1">figsize</span><span class="s3">=(</span><span class="s5">8</span><span class="s3">, </span><span class="s5">6</span><span class="s3">))</span>
+<span class="s1">sns</span><span class="s3">.</span><span class="s1">scatterplot</span><span class="s3">(</span><span class="s1">x</span><span class="s3">=</span><span class="s4">'Item_MRP'</span><span class="s3">, </span><span class="s1">y</span><span class="s3">=</span><span class="s4">'Item_Outlet_Sales'</span><span class="s3">, </span><span class="s1">data</span><span class="s3">=</span><span class="s1">df</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">title</span><span class="s3">(</span><span class="s4">&quot;MRP vs Sales&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">xlabel</span><span class="s3">(</span><span class="s4">&quot;MRP&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">ylabel</span><span class="s3">(</span><span class="s4">&quot;Sales&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">show</span><span class="s3">()</span>
+
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">figure</span><span class="s3">(</span><span class="s1">figsize</span><span class="s3">=(</span><span class="s5">8</span><span class="s3">, </span><span class="s5">6</span><span class="s3">))</span>
+<span class="s1">sns</span><span class="s3">.</span><span class="s1">boxplot</span><span class="s3">(</span><span class="s1">x</span><span class="s3">=</span><span class="s4">'Outlet_Type'</span><span class="s3">, </span><span class="s1">y</span><span class="s3">=</span><span class="s4">'Item_Outlet_Sales'</span><span class="s3">, </span><span class="s1">data</span><span class="s3">=</span><span class="s1">df</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">title</span><span class="s3">(</span><span class="s4">&quot;Sales by Outlet Type&quot;</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">xticks</span><span class="s3">(</span><span class="s1">rotation</span><span class="s3">=</span><span class="s5">45</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">show</span><span class="s3">()</span>
+
+<span class="s0"># ✅ Step 8: Missing Value Treatment</span>
+<span class="s2">if </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Weight'</span><span class="s3">].</span><span class="s1">isnull</span><span class="s3">().</span><span class="s1">sum</span><span class="s3">() &gt; </span><span class="s5">0</span><span class="s3">:</span>
+    <span class="s1">imputer </span><span class="s3">= </span><span class="s1">SimpleImputer</span><span class="s3">(</span><span class="s1">strategy</span><span class="s3">=</span><span class="s4">'median'</span><span class="s3">)</span>
+    <span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Weight'</span><span class="s3">] = </span><span class="s1">imputer</span><span class="s3">.</span><span class="s1">fit_transform</span><span class="s3">(</span><span class="s1">df</span><span class="s3">[[</span><span class="s4">'Item_Weight'</span><span class="s3">]])</span>
+
+<span class="s1">df</span><span class="s3">.</span><span class="s1">loc</span><span class="s3">[:, </span><span class="s4">'Outlet_Size'</span><span class="s3">] = </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Outlet_Size'</span><span class="s3">].</span><span class="s1">fillna</span><span class="s3">(</span><span class="s4">&quot;Unknown&quot;</span><span class="s3">)</span>
+
+<span class="s0"># ✅ Step 9: Feature Engineering</span>
+<span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Age'</span><span class="s3">] = </span><span class="s5">2023 </span><span class="s3">- </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Outlet_Establishment_Year'</span><span class="s3">]</span>
+<span class="s1">df</span><span class="s3">[</span><span class="s4">'Sales_Per_Unit_Visibility'</span><span class="s3">] = </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Outlet_Sales'</span><span class="s3">] / (</span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Visibility'</span><span class="s3">] + </span><span class="s5">1e-6</span><span class="s3">)</span>
+
+<span class="s0"># ✅ Step 10-12: Encoding Categorical Variables</span>
+<span class="s1">le </span><span class="s3">= </span><span class="s1">LabelEncoder</span><span class="s3">()</span>
+<span class="s1">df</span><span class="s3">[</span><span class="s4">'Outlet_Identifier'</span><span class="s3">] = </span><span class="s1">le</span><span class="s3">.</span><span class="s1">fit_transform</span><span class="s3">(</span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Outlet_Identifier'</span><span class="s3">])</span>
+<span class="s1">df</span><span class="s3">[</span><span class="s4">'Outlet_Type'</span><span class="s3">] = </span><span class="s1">le</span><span class="s3">.</span><span class="s1">fit_transform</span><span class="s3">(</span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Outlet_Type'</span><span class="s3">])</span>
+
+<span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Fat_Content'</span><span class="s3">] = </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Fat_Content'</span><span class="s3">].</span><span class="s1">replace</span><span class="s3">({</span><span class="s4">'LF'</span><span class="s3">: </span><span class="s4">'Low Fat'</span><span class="s3">, </span><span class="s4">'low fat'</span><span class="s3">: </span><span class="s4">'Low Fat'</span><span class="s3">, </span><span class="s4">'reg'</span><span class="s3">: </span><span class="s4">'Regular'</span><span class="s3">})</span>
+<span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Fat_Content'</span><span class="s3">] = </span><span class="s1">le</span><span class="s3">.</span><span class="s1">fit_transform</span><span class="s3">(</span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Fat_Content'</span><span class="s3">])</span>
+
+<span class="s1">df </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">get_dummies</span><span class="s3">(</span><span class="s1">df</span><span class="s3">, </span><span class="s1">columns</span><span class="s3">=[</span><span class="s4">'Item_Type'</span><span class="s3">, </span><span class="s4">'Outlet_Location_Type'</span><span class="s3">, </span><span class="s4">'Outlet_Size'</span><span class="s3">], </span><span class="s1">drop_first</span><span class="s3">=</span><span class="s2">True</span><span class="s3">)</span>
+
+<span class="s0"># ✅ Step 13: Preprocessing Data</span>
+<span class="s1">X </span><span class="s3">= </span><span class="s1">df</span><span class="s3">.</span><span class="s1">drop</span><span class="s3">([</span><span class="s4">'Item_Outlet_Sales'</span><span class="s3">, </span><span class="s4">'Item_Identifier'</span><span class="s3">, </span><span class="s4">'Outlet_Establishment_Year'</span><span class="s3">], </span><span class="s1">axis</span><span class="s3">=</span><span class="s5">1</span><span class="s3">)</span>
+<span class="s1">y </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Item_Outlet_Sales'</span><span class="s3">]</span>
+
+<span class="s1">X_train</span><span class="s3">, </span><span class="s1">X_test</span><span class="s3">, </span><span class="s1">y_train</span><span class="s3">, </span><span class="s1">y_test </span><span class="s3">= </span><span class="s1">train_test_split</span><span class="s3">(</span><span class="s1">X</span><span class="s3">, </span><span class="s1">y</span><span class="s3">, </span><span class="s1">test_size</span><span class="s3">=</span><span class="s5">0.2</span><span class="s3">, </span><span class="s1">random_state</span><span class="s3">=</span><span class="s5">42</span><span class="s3">)</span>
+
+<span class="s1">scaler </span><span class="s3">= </span><span class="s1">StandardScaler</span><span class="s3">()</span>
+<span class="s1">X_train_scaled </span><span class="s3">= </span><span class="s1">scaler</span><span class="s3">.</span><span class="s1">fit_transform</span><span class="s3">(</span><span class="s1">X_train</span><span class="s3">)</span>
+<span class="s1">X_test_scaled </span><span class="s3">= </span><span class="s1">scaler</span><span class="s3">.</span><span class="s1">transform</span><span class="s3">(</span><span class="s1">X_test</span><span class="s3">)</span>
+
+<span class="s0"># ✅ Step 14-18: Modeling</span>
+
+<span class="s0"># 1) Linear Regression</span>
+<span class="s1">lr </span><span class="s3">= </span><span class="s1">LinearRegression</span><span class="s3">()</span>
+<span class="s1">lr</span><span class="s3">.</span><span class="s1">fit</span><span class="s3">(</span><span class="s1">X_train</span><span class="s3">, </span><span class="s1">y_train</span><span class="s3">)</span>
+<span class="s1">y_pred_lr </span><span class="s3">= </span><span class="s1">lr</span><span class="s3">.</span><span class="s1">predict</span><span class="s3">(</span><span class="s1">X_test</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Linear Regression R2 Score:&quot;</span><span class="s3">, </span><span class="s1">r2_score</span><span class="s3">(</span><span class="s1">y_test</span><span class="s3">, </span><span class="s1">y_pred_lr</span><span class="s3">))</span>
+
+<span class="s0"># 2) Ridge Regression</span>
+<span class="s1">ridge </span><span class="s3">= </span><span class="s1">Ridge</span><span class="s3">(</span><span class="s1">alpha</span><span class="s3">=</span><span class="s5">1.0</span><span class="s3">)</span>
+<span class="s1">ridge</span><span class="s3">.</span><span class="s1">fit</span><span class="s3">(</span><span class="s1">X_train_scaled</span><span class="s3">, </span><span class="s1">y_train</span><span class="s3">)</span>
+<span class="s1">y_pred_ridge </span><span class="s3">= </span><span class="s1">ridge</span><span class="s3">.</span><span class="s1">predict</span><span class="s3">(</span><span class="s1">X_test_scaled</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Ridge Regression R2 Score:&quot;</span><span class="s3">, </span><span class="s1">r2_score</span><span class="s3">(</span><span class="s1">y_test</span><span class="s3">, </span><span class="s1">y_pred_ridge</span><span class="s3">))</span>
+
+<span class="s0"># 3) Random Forest</span>
+<span class="s1">rf </span><span class="s3">= </span><span class="s1">RandomForestRegressor</span><span class="s3">(</span><span class="s1">n_estimators</span><span class="s3">=</span><span class="s5">100</span><span class="s3">, </span><span class="s1">random_state</span><span class="s3">=</span><span class="s5">42</span><span class="s3">)</span>
+<span class="s1">rf</span><span class="s3">.</span><span class="s1">fit</span><span class="s3">(</span><span class="s1">X_train</span><span class="s3">, </span><span class="s1">y_train</span><span class="s3">)</span>
+<span class="s1">y_pred_rf </span><span class="s3">= </span><span class="s1">rf</span><span class="s3">.</span><span class="s1">predict</span><span class="s3">(</span><span class="s1">X_test</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Random Forest R2 Score:&quot;</span><span class="s3">, </span><span class="s1">r2_score</span><span class="s3">(</span><span class="s1">y_test</span><span class="s3">, </span><span class="s1">y_pred_rf</span><span class="s3">))</span>
+
+<span class="s0"># 4) XGBoost with Hyperparameter Tuning</span>
+<span class="s1">xgb </span><span class="s3">= </span><span class="s1">XGBRegressor</span><span class="s3">(</span><span class="s1">random_state</span><span class="s3">=</span><span class="s5">42</span><span class="s3">)</span>
+<span class="s1">xgb_params </span><span class="s3">= {</span><span class="s4">'n_estimators'</span><span class="s3">: [</span><span class="s5">100</span><span class="s3">, </span><span class="s5">200</span><span class="s3">, </span><span class="s5">300</span><span class="s3">], </span><span class="s4">'learning_rate'</span><span class="s3">: [</span><span class="s5">0.01</span><span class="s3">, </span><span class="s5">0.05</span><span class="s3">, </span><span class="s5">0.1</span><span class="s3">], </span><span class="s4">'max_depth'</span><span class="s3">: [</span><span class="s5">3</span><span class="s3">, </span><span class="s5">5</span><span class="s3">, </span><span class="s5">7</span><span class="s3">]}</span>
+<span class="s1">grid_search_xgb </span><span class="s3">= </span><span class="s1">GridSearchCV</span><span class="s3">(</span><span class="s1">xgb</span><span class="s3">, </span><span class="s1">xgb_params</span><span class="s3">, </span><span class="s1">cv</span><span class="s3">=</span><span class="s5">3</span><span class="s3">, </span><span class="s1">scoring</span><span class="s3">=</span><span class="s4">'r2'</span><span class="s3">, </span><span class="s1">n_jobs</span><span class="s3">=-</span><span class="s5">1</span><span class="s3">)</span>
+<span class="s1">grid_search_xgb</span><span class="s3">.</span><span class="s1">fit</span><span class="s3">(</span><span class="s1">X_train</span><span class="s3">, </span><span class="s1">y_train</span><span class="s3">)</span>
+
+<span class="s1">best_xgb </span><span class="s3">= </span><span class="s1">grid_search_xgb</span><span class="s3">.</span><span class="s1">best_estimator_</span>
+<span class="s1">y_pred_xgb </span><span class="s3">= </span><span class="s1">best_xgb</span><span class="s3">.</span><span class="s1">predict</span><span class="s3">(</span><span class="s1">X_test</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">XGBoost R2 Score (After Tuning):&quot;</span><span class="s3">, </span><span class="s1">r2_score</span><span class="s3">(</span><span class="s1">y_test</span><span class="s3">, </span><span class="s1">y_pred_xgb</span><span class="s3">))</span>
+
+<span class="s0"># ✅ Step 19: Feature Importance Graph (Fixed Warning)</span>
+<span class="s1">feature_importance </span><span class="s3">= </span><span class="s1">best_xgb</span><span class="s3">.</span><span class="s1">feature_importances_</span>
+<span class="s1">feature_importance_df </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">DataFrame</span><span class="s3">({</span><span class="s4">'Feature'</span><span class="s3">: </span><span class="s1">X</span><span class="s3">.</span><span class="s1">columns</span><span class="s3">, </span><span class="s4">'Importance'</span><span class="s3">: </span><span class="s1">feature_importance</span><span class="s3">})</span>
+<span class="s1">feature_importance_df </span><span class="s3">= </span><span class="s1">feature_importance_df</span><span class="s3">.</span><span class="s1">sort_values</span><span class="s3">(</span><span class="s1">by</span><span class="s3">=</span><span class="s4">'Importance'</span><span class="s3">, </span><span class="s1">ascending</span><span class="s3">=</span><span class="s2">False</span><span class="s3">)</span>
+
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">figure</span><span class="s3">(</span><span class="s1">figsize</span><span class="s3">=(</span><span class="s5">12</span><span class="s3">, </span><span class="s5">6</span><span class="s3">))</span>
+<span class="s1">sns</span><span class="s3">.</span><span class="s1">barplot</span><span class="s3">(</span><span class="s1">x</span><span class="s3">=</span><span class="s4">'Importance'</span><span class="s3">, </span><span class="s1">y</span><span class="s3">=</span><span class="s4">'Feature'</span><span class="s3">, </span><span class="s1">hue</span><span class="s3">=</span><span class="s4">'Feature'</span><span class="s3">, </span><span class="s1">data</span><span class="s3">=</span><span class="s1">feature_importance_df</span><span class="s3">, </span><span class="s1">palette</span><span class="s3">=</span><span class="s4">'viridis'</span><span class="s3">, </span><span class="s1">legend</span><span class="s3">=</span><span class="s2">False</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">title</span><span class="s3">(</span><span class="s4">'Feature Importance - XGBoost'</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">xlabel</span><span class="s3">(</span><span class="s4">'Importance Score'</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">ylabel</span><span class="s3">(</span><span class="s4">'Features'</span><span class="s3">)</span>
+<span class="s1">plt</span><span class="s3">.</span><span class="s1">show</span><span class="s3">()</span>
+
+<span class="s0"># ✅ Step 20: Saving Models</span>
+<span class="s1">joblib</span><span class="s3">.</span><span class="s1">dump</span><span class="s3">(</span><span class="s1">lr</span><span class="s3">, </span><span class="s4">&quot;linear_regression_model.pkl&quot;</span><span class="s3">)</span>
+<span class="s1">joblib</span><span class="s3">.</span><span class="s1">dump</span><span class="s3">(</span><span class="s1">ridge</span><span class="s3">, </span><span class="s4">&quot;ridge_regression_model.pkl&quot;</span><span class="s3">)</span>
+<span class="s1">joblib</span><span class="s3">.</span><span class="s1">dump</span><span class="s3">(</span><span class="s1">rf</span><span class="s3">, </span><span class="s4">&quot;random_forest_model.pkl&quot;</span><span class="s3">)</span>
+<span class="s1">joblib</span><span class="s3">.</span><span class="s1">dump</span><span class="s3">(</span><span class="s1">best_xgb</span><span class="s3">, </span><span class="s4">&quot;xgboost_model.pkl&quot;</span><span class="s3">)</span>
+
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s2">\n</span><span class="s4">Final models saved successfully!&quot;</span><span class="s3">)</span>
+</pre>
+</body>
+</html>
